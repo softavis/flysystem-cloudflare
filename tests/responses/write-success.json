@@ -1,0 +1,14 @@
+{
+  "result": {
+    "id": "634ycoccv2d89026x6eq.jpg",
+    "filename": "634ycoccv2d89026x6eq.jpg",
+    "uploaded": "2024-02-17T17:44:44.637Z",
+    "requireSignedURLs": false,
+    "variants": [
+      "https://imagedelivery.net/some-account-hash/634ycoccv2d89026x6eq.jpg/public"
+    ]
+  },
+  "success": true,
+  "errors": [],
+  "messages": []
+}

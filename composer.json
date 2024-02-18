@@ -1,0 +1,47 @@
+{
+    "name": "softavis/flysystem-cloudflare",
+    "description": "Flysystem Adapter for Cloudflare Images",
+    "type": "library",
+    "keywords": [
+        "flysystem",
+        "filesystem",
+        "cloudflare",
+        "images"
+    ],
+    "authors": [
+        {
+            "name": "Zlatin Hristov",
+            "email": "zlatin.hristov@softavis.com"
+        },
+        {
+            "name": "Softavis Ltd",
+            "homepage": "https://www.softavis.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*",
+        "ext-fileinfo": "*",
+        "league/flysystem": "^2.0||^3.0",
+        "symfony/http-client": "^5.4||^6.0||^7.0"
+    },
+    "require-dev": {
+        "league/flysystem-adapter-test-utilities": "^3.21",
+        "phpunit/phpunit": "^11.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Softavis\\Flysystem\\Cloudflare\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Softavis\\Flysystem\\Cloudflare\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "config": {
+        "sort-packages": true
+    }
+}

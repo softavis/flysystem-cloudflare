@@ -1,0 +1,11 @@
+{
+  "result": null,
+  "success": false,
+  "errors": [
+    {
+      "code": 5404,
+      "message": "Image not found"
+    }
+  ],
+  "messages": []
+}
