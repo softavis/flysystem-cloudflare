@@ -106,7 +106,7 @@ final class CloudflareImagesAdapter implements FilesystemAdapter
 
     public function createDirectory(string $path, Config $config): void
     {
-        // Cloudflare image does not have directories
+        // Cloudflare Images does not have directories
     }
 
     public function setVisibility(string $path, string $visibility): void
