@@ -1,0 +1,19 @@
+{
+  "result": {
+      "id": "96111ea1-0d79-4c84-8697-ffa863da4817.jpeg",
+      "filename": "96111ea1-0d79-4c84-8697-ffa863da4817.jpeg",
+      "meta": {
+          "fileSize": 10688,
+          "mimeType": "image/jpeg",
+          "extension": "jpg"
+      },
+      "uploaded": "2023-11-06T07:39:17.653Z",
+      "requireSignedURLs": false,
+      "variants": [
+          "https://imagedelivery.net/some-account-hash/96111ea1-0d79-4c84-8697-ffa863da4817.jpeg/public"
+      ]
+  },
+  "success": true,
+  "errors": [],
+  "messages": []
+}

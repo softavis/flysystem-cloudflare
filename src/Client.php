@@ -15,18 +15,22 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class Client
 {
+    private const API_VERSION = 'v1';
+
     private const DEFAULT_LIMIT = 1000;
     private const DEFAULT_ORDER = 'DESC';
-
-    private const API_VERSION = 'v1';
 
     private const METHOD_GET = 'GET';
     private const METHOD_POST = 'POST';
     private const METHOD_PATCH = 'PATCH';
     private const METHOD_DELETE = 'DELETE';
 
-    public function __construct(private readonly HttpClientInterface $client)
+    /** @var HttpClientInterface $client */
+    private $client;
+
+    public function __construct(HttpClientInterface $client)
     {
+        $this->client = $client;
     }
 
     /**
@@ -52,7 +56,27 @@ final class Client
         return $this->client->request(self::METHOD_GET, self::API_VERSION.'/'.$imageId.'/blob')->getContent();
     }
 
-    public function list(int $perPage = self::DEFAULT_LIMIT, string $order = self::DEFAULT_ORDER): array
+    /**
+     * @param string $path
+     * @param int $perPage
+     * @param string $sortOrder
+     *
+     * @return array{
+     *     id: string,
+     *     filename: string,
+     *     meta: array<string, string>,
+     *     requireSignedUrls: bool,
+     *     uploaded: string,
+     *     variants: string[]
+     * }
+     *
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function list(string $path, int $perPage = self::DEFAULT_LIMIT, string $sortOrder = self::DEFAULT_ORDER): array
     {
         $images = [];
         $continuationToken = null;
@@ -77,12 +101,20 @@ final class Client
              */
             $response = $this->client->request(self::METHOD_GET, 'v2/', [
                 'query' => [
-                    'per_page' => $this->validateLimit($perPage),
-                    'sort_order' => $this->validateOrder($order),
+                    'per_page' => $perPage,
+                    'sort_order' => $sortOrder,
                     'continuation_token' => $continuationToken,
                 ]
-            ]);
-            $images += $response['result']['images'];
+            ])->toArray();
+
+            array_walk(
+                $response['result']['images'],
+                function(array $image) use ($path, &$images) {
+                    if (substr($path, 0, strlen($path)) === $path) {
+                       $images[] = $image;
+                    }
+                }
+            );
         } while (null !== $continuationToken = $response['result']['continuation_token']);
 
         return $images;
@@ -90,7 +122,7 @@ final class Client
 
     /**
      * @param string $path
-     * @param string|resource $content
+     * @param mixed $content
      * @param Config $config
      *
      * @return array
@@ -101,10 +133,19 @@ final class Client
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    public function upload(string $path, mixed $content, Config $config): array
+    public function upload(string $path, $content, Config $config): array
     {
-        $visibility = $config->get(Config::OPTION_DIRECTORY_VISIBILITY, false);
-        $metadata = $this->buildMetadata($content);
+        $fileInfo = new finfo(FILEINFO_NONE);
+        [$width, $height] = getimagesizefromstring($content);
+        $visibility = $config->get(Config::OPTION_VISIBILITY, false);
+
+        $metadata = [
+            'width' => $width,
+            'height' => $height,
+            'fileSize' => strlen($content),
+            'mimeType' => $fileInfo->buffer($content, FILEINFO_MIME_TYPE),
+            'extension' => $fileInfo->buffer($content, FILEINFO_EXTENSION),
+        ];
 
         return $this->client->request(self::METHOD_POST, self::API_VERSION, [
             'body' => [
@@ -125,7 +166,7 @@ final class Client
      */
     public function update(string $imageId, Config $config): array
     {
-        $visibility = $config->get(Config::OPTION_DIRECTORY_VISIBILITY, false);
+        $visibility = $config->get(Config::OPTION_VISIBILITY, false);
 
         return $this->client->request(self::METHOD_PATCH, self::API_VERSION.'/'.$imageId, [
             'body' => [
@@ -144,30 +185,5 @@ final class Client
     public function delete(string $imageId): array
     {
         return $this->client->request(self::METHOD_DELETE, self::API_VERSION.'/'.$imageId)->toArray();
-    }
-
-    private function validateOrder(string $order): string
-    {
-        return in_array($order, ['ASC', 'DESC']) ? $order : self::DEFAULT_ORDER;
-    }
-
-    private function validateLimit(int $limit): int
-    {
-        return $limit >= 10 && $limit <= 1000 ? $limit : self::DEFAULT_LIMIT;
-    }
-
-    private function buildMetadata(string $contents): array
-    {
-        $fileInfo = new finfo(FILEINFO_NONE);
-
-        [$width, $height] = getimagesizefromstring($contents);
-
-        return [
-            'width' => $width,
-            'height' => $height,
-            'fileSize' => strlen($contents),
-            'mimeType' => $fileInfo->buffer($contents, FILEINFO_MIME_TYPE),
-            'extension' => $fileInfo->buffer($contents, FILEINFO_EXTENSION),
-        ];
     }
 }

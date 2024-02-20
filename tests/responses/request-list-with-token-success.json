@@ -1,0 +1,42 @@
+{
+    "result": {
+        "images": [
+            {
+                "id": "/thumbnails/96111ea1-0d79-4c84-8697-ffa863da4817-tmp-laf-65403742a9d31-jpeg",
+                "filename": "tmp-laf-6548982226dd8.jpeg",
+                "meta": {
+                    "size": 10688,
+                    "type": "file",
+                    "filename": "tmp-laf-6548272ccd7ce.jpeg",
+                    "content_type": "image/jpeg"
+                },
+                "uploaded": "2023-11-06T07:39:17.653Z",
+                "requireSignedURLs": false,
+                "variants": [
+                    "https://imagedelivery.net/HKGs0qSz71mD4DZrAgz5Iw/96111ea1-0d79-4c84-8697-ffa863da4817-tmp-laf-65403742a9d31-jpeg/original",
+                    "https://imagedelivery.net/HKGs0qSz71mD4DZrAgz5Iw/96111ea1-0d79-4c84-8697-ffa863da4817-tmp-laf-65403742a9d31-jpeg/medium"
+                ]
+            },
+            {
+                "id": "/thumbnails/dc2b5234-ad5b-465f-b344-04b59835b3e3-tmp-laf-6540373fc20d8-jpeg",
+                "filename": "tmp-laf-6548981f3285a.jpeg",
+                "meta": {
+                    "size": 132383,
+                    "type": "file",
+                    "filename": "tmp-laf-654827299c5d8.jpeg",
+                    "content_type": "image/jpeg"
+                },
+                "uploaded": "2023-11-06T07:39:14.710Z",
+                "requireSignedURLs": false,
+                "variants": [
+                    "https://imagedelivery.net/HKGs0qSz71mD4DZrAgz5Iw/dc2b5234-ad5b-465f-b344-04b59835b3e3-tmp-laf-6540373fc20d8-jpeg/original",
+                    "https://imagedelivery.net/HKGs0qSz71mD4DZrAgz5Iw/dc2b5234-ad5b-465f-b344-04b59835b3e3-tmp-laf-6540373fc20d8-jpeg/medium"
+                ]
+            }
+        ],
+        "continuation_token": "A6FJG7WGe5Cw5j-k455cmcHI-0vAcX4AXZFvi80IBgA"
+    },
+    "success": true,
+    "errors": [],
+    "messages": []
+}

@@ -12,16 +12,19 @@ use League\Flysystem\UnableToCheckFileExistence;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToSetVisibility;
 use League\Flysystem\UnableToWriteFile;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 
-final class CloudflareImagesAdapter implements FilesystemAdapter
+final class CloudflareAdapter implements FilesystemAdapter
 {
-    public function __construct(
-        private readonly Client $client,
-    )
+    /** @var Client $client */
+    private $client;
+
+    public function __construct(Client $client)
     {
+        $this->client = $client;
     }
 
     public function fileExists(string $path): bool
@@ -101,7 +104,11 @@ final class CloudflareImagesAdapter implements FilesystemAdapter
 
     public function deleteDirectory(string $path): void
     {
-        // Cloudflare image does not have directories
+        $images = $this->client->list($path);
+
+        foreach ($images as $image) {
+            $this->delete($image['id']);
+        }
     }
 
     public function createDirectory(string $path, Config $config): void
@@ -144,34 +151,26 @@ final class CloudflareImagesAdapter implements FilesystemAdapter
 
     public function listContents(string $path, bool $deep): iterable
     {
-        return $this->client->list();
+        return $this->client->list($path);
     }
 
     public function move(string $source, string $destination, Config $config): void
     {
-        if ($source === $destination) {
-            throw UnableToMoveFile::sourceAndDestinationAreTheSame($source, $destination);
-        }
-
         try {
             $this->client->upload($destination, file_get_contents($source), $config);
         } catch (\Throwable $e) {
-            throw UnableToMoveFile::because($e->getMessage(), $source, $destination);
+            throw UnableToMoveFile::fromLocationTo($source, $destination, $e);
         }
     }
 
     public function copy(string $source, string $destination, Config $config): void
     {
-        if ($source === $destination) {
-            throw UnableToMoveFile::sourceAndDestinationAreTheSame($source, $destination);
-        }
-
         try {
             $current = $this->client->read($source);
             $this->delete($source);
             $this->client->upload($destination, file_get_contents($current), $config);
         } catch (\Throwable $e) {
-            throw UnableToMoveFile::because($e->getMessage(), $source, $destination);
+            throw UnableToMoveFile::fromLocationTo($source, $destination);
         }
     }
 
@@ -180,7 +179,7 @@ final class CloudflareImagesAdapter implements FilesystemAdapter
         try {
             $response = $this->client->get($path);
         } catch (\Throwable $e) {
-            throw UnableToSetVisibility::atLocation($path, $e->getMessage(), $e);
+            throw UnableToRetrieveMetadata::create($path, $e->getMessage(), $e);
         }
 
         try {
@@ -191,13 +190,11 @@ final class CloudflareImagesAdapter implements FilesystemAdapter
 
         $metadata = $response['metadata'];
 
-        return new FileAttributes(
-            path: $path,
-            fileSize: $metadata['fileSize'] ?? null,
-            visibility: $response['requireSignedURLs'],
-            lastModified: $uploaded->getTimestamp(),
-            mimeType: $metadata['mimeType'] ?? null,
-            extraMetadata: $metadata,
-        );
+        $fileSize = $metadata['fileSize'] ?? null;
+        $visibility = $response['requireSignedURLs'];
+        $lastModified = $uploaded->getTimestamp();
+        $mimeType = $metadata['mimeType'] ?? null;
+
+        return new FileAttributes($path, $fileSize, $visibility, $lastModified, $mimeType, $metadata);
     }
 }
