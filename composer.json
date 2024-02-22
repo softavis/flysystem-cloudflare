@@ -20,10 +20,11 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "ext-json": "*",
         "ext-fileinfo": "*",
+        "ext-json": "*",
         "league/flysystem": "^2.0||^3.0",
-        "symfony/http-client": "^5.4||^6.0||^7.0"
+        "symfony/http-client": "^5.4||^6.0||^7.0",
+        "symfony/mime": "^6.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.6"

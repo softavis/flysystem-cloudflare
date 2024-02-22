@@ -6,6 +6,10 @@ namespace Softavis\Flysystem\Cloudflare;
 
 use finfo;
 use League\Flysystem\Config;
+use League\Flysystem\Visibility;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
+use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -137,23 +141,27 @@ final class Client
     {
         $fileInfo = new finfo(FILEINFO_NONE);
         [$width, $height] = getimagesizefromstring($content);
-        $visibility = $config->get(Config::OPTION_VISIBILITY, false);
+        $visibility = $config->get(Config::OPTION_VISIBILITY, true);
 
         $metadata = [
             'width' => $width,
             'height' => $height,
-            'fileSize' => strlen($content),
+            'size' => strlen($content),
+            'filename' => pathinfo($path, PATHINFO_BASENAME),
             'mimeType' => $fileInfo->buffer($content, FILEINFO_MIME_TYPE),
             'extension' => $fileInfo->buffer($content, FILEINFO_EXTENSION),
         ];
 
+        $formData = new FormDataPart([
+            'id' => $path,
+            'file' => new DataPart($content, $metadata['filename']),
+            'metadata' => json_encode($metadata),
+            'requireSignedURLs' => !$visibility ? 'true' : 'false',
+        ]);
+
         return $this->client->request(self::METHOD_POST, self::API_VERSION, [
-            'body' => [
-                'id' => $path,
-                'file' => $content,
-                'metadata' => $metadata,
-                'requireSignedURLs' => $visibility,
-            ]
+            'headers' => $formData->getPreparedHeaders()->toArray(),
+            'body' => $formData->toIterable(),
         ])->toArray();
     }
 
