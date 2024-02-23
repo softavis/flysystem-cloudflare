@@ -17,19 +17,30 @@ composer require softavis/flysystem-cloudflare
 
 ## Usage
 ```php
-// Create a Gitlab Client to talk with the API
-$client = new Client('project-id', 'branch', 'base-url', 'personal-access-token');
-   
-// Create the Adapter that implements Flysystems AdapterInterface
-$adapter = new GitlabAdapter(
-    // Gitlab API Client
-    $client,
-    // Optional path prefix
-    'path/prefix',
-);
+<?php
 
-// The FilesystemOperator
-$filesystem = new League\Flysystem\Filesystem($adapter);
+declare(strict_types=1);
+
+use League\Flysystem\Config;
+use Softavis\Flysystem\Cloudflare\Client;
+use Softavis\Flysystem\Cloudflare\CloudflareAdapter;
+use Symfony\Component\HttpClient\HttpClient;
+
+require './vendor/autoload.php';
+
+const CLOUDFLARE_ACCOUNT_ID = 'your-cloudflare-account-id';
+const CLOUDFLARE_ACCOUNT_HASH = 'your-cloudflare-account-hash';
+const CLOUDFLARE_API_KEY = 'your-cloudflare-access-token';
+
+const CLOUDFLARE_URL = 'https://api.cloudflare.com/client/v4/accounts/%s/images/';
+
+$client = new Client(HttpClient::createForBaseUri(sprintf(CLOUDFLARE_URL, CLOUDFLARE_ACCOUNT_ID), [
+    'auth_bearer' => CLOUDFLARE_API_KEY,
+]));
+
+$adapter = new CloudflareAdapter($client);
+
+$flysystem = new League\Flysystem\Filesystem($adapter);
 
 // see http://flysystem.thephpleague.com/api/ for full list of available functionality
 ```
