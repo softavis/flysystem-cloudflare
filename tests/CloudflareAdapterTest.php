@@ -81,6 +81,22 @@ class CloudflareAdapterTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
+    public function testPublicUrlReturnCorrectSuccess(): void
+    {
+        $imageId = 'image-id.jpeg';
+        $accountHash = 'account-hash';
+        $variantName = 'public';
+
+        $config = ['accountHash' => $accountHash, 'variantName' => $variantName];
+        $adapter = new CloudflareAdapter(new Client(new MockHttpClient()));
+
+        $imageUrl = $adapter->publicUrl($imageId, new Config($config));
+
+        $expectedUrl = "https://imagedelivery.net/{$accountHash}/{$imageId}/{$variantName}";
+
+        $this->assertSame($expectedUrl, $imageUrl);
+    }
+
     private function getAdapter(string $fileResponse, int $statusCode = 200): CloudflareAdapter
     {
         return new CloudflareAdapter(new Client($this->getMockHttpClient($fileResponse, $statusCode)));

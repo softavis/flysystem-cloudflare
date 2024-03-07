@@ -28,9 +28,10 @@ use Symfony\Component\HttpClient\HttpClient;
 
 require './vendor/autoload.php';
 
+const CLOUDFLARE_API_KEY = 'your-cloudflare-access-token';
 const CLOUDFLARE_ACCOUNT_ID = 'your-cloudflare-account-id';
 const CLOUDFLARE_ACCOUNT_HASH = 'your-cloudflare-account-hash';
-const CLOUDFLARE_API_KEY = 'your-cloudflare-access-token';
+const CLOUDFLARE_VARIANT_NAME = 'your-cloudflare-images-variant';
 
 const CLOUDFLARE_URL = 'https://api.cloudflare.com/client/v4/accounts/%s/images/';
 
@@ -40,7 +41,10 @@ $client = new Client(HttpClient::createForBaseUri(sprintf(CLOUDFLARE_URL, CLOUDF
 
 $adapter = new CloudflareAdapter($client);
 
-$flysystem = new League\Flysystem\Filesystem($adapter);
+$flysystem = new League\Flysystem\Filesystem($adapter, [
+    'accountHash' => CLOUDFLARE_ACCOUNT_HASH,
+    'variantName' => CLOUDFLARE_VARIANT_NAME
+]);
 
 // see http://flysystem.thephpleague.com/api/ for full list of available functionality
 ```

@@ -15,9 +15,10 @@ use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToSetVisibility;
 use League\Flysystem\UnableToWriteFile;
+use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 
-final class CloudflareAdapter implements FilesystemAdapter
+final class CloudflareAdapter implements FilesystemAdapter, PublicUrlGenerator
 {
     /** @var Client $client */
     private $client;
@@ -179,7 +180,7 @@ final class CloudflareAdapter implements FilesystemAdapter
         try {
             $response = $this->client->get($path);
         } catch (\Throwable $e) {
-            throw UnableToRetrieveMetadata::create($path, $e->getMessage(), $e);
+            throw UnableToRetrieveMetadata::create($path, $e->getMessage(), $e->getMessage(), $e);
         }
 
         try {
@@ -196,5 +197,14 @@ final class CloudflareAdapter implements FilesystemAdapter
         $mimeType = $metadata['mimeType'] ?? null;
 
         return new FileAttributes($path, $fileSize, $visibility, $lastModified, $mimeType, $metadata);
+    }
+
+    public function publicUrl(string $path, Config $config): string
+    {
+        return strtr('https://imagedelivery.net/{accountHash}/{path}/{variant}', [
+            '{accountHash}' => $config->get('accountHash'),
+            '{path}' => $path,
+            '{variant}' => $config->get('variantName')
+        ]);
     }
 }
