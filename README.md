@@ -49,31 +49,25 @@ $flysystem = new League\Flysystem\Filesystem($adapter, [
 // see http://flysystem.thephpleague.com/api/ for full list of available functionality
 ```
 
-### Usage with Symfony 
-First, add cloudflare scoped client (edit **config/packages/framework.yaml**) and add:
-```
-scoped_clients:
-    cloudflare.client:
-        base_uri: 'https://api.cloudflare.com/client/v4/accounts/%env(CLOUDFLARE_ACCOUNT_ID)%/images/'
-        auth_bearer: '%env(CLOUDFLARE_API_KEY)%'
-```
-Next, add cloudflare flysystem services (edit **config/services.yaml**):
-```
-cloudflare_adapter:
-    class: 'Softavis\Flysystem\Cloudflare\CloudflareAdapter'
-    arguments: [ '@cloudflare_client' ]
+### Usage with Symfony
+In `config/packages/flysystem.yaml`, add:
 
-cloudflare_client:
-    class: 'Softavis\Flysystem\Cloudflare\Client'
-    arguments: [ '@cloudflare.client' ] # This argument is our scoped client
-```
+```yaml
+services:
+    Softavis\Flysystem\Cloudflare\Client:
+        arguments:
+            - '@Symfony\Contracts\HttpClient\HttpClientInterface'
+            - "%env(CLOUDFLARE_URL)%"
+            - "%env(CLOUDFLARE_ACCOUNT_ID)%"
+            - "%env(CLOUDFLARE_API_KEY)%"
+    Softavis\Flysystem\Cloudflare\CloudflareAdapter:
+        arguments:
+            - '@Softavis\Flysystem\Cloudflare\Client'
 
-Last, add *cloudflare_adapter* to flysystem configuration (edit **config/packages/flysystem.yaml**)
-```
 flysystem:
     storages:
-        default.storage:
-            adapter: 'cloudflare_adapter'
+        default.storage.cloudflareimages:
+            adapter: 'Softavis\Flysystem\Cloudflare\CloudflareAdapter'
 ```
 
 ## Changelog
