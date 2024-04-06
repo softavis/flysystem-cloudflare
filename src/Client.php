@@ -140,21 +140,23 @@ final class Client
     public function upload(string $path, $content, Config $config): array
     {
         $fileInfo = new finfo(FILEINFO_NONE);
-        [$width, $height] = getimagesizefromstring($content);
+        $imageContent = is_resource($content) ? stream_get_contents($content) : $content;
+
+        [$width, $height] = getimagesizefromstring($imageContent);
         $visibility = $config->get(Config::OPTION_VISIBILITY, true);
 
         $metadata = [
             'width' => $width,
             'height' => $height,
-            'size' => strlen($content),
+            'size' => strlen($imageContent),
             'filename' => pathinfo($path, PATHINFO_BASENAME),
-            'mimeType' => $fileInfo->buffer($content, FILEINFO_MIME_TYPE),
-            'extension' => $fileInfo->buffer($content, FILEINFO_EXTENSION),
+            'mimeType' => $fileInfo->buffer($imageContent, FILEINFO_MIME_TYPE),
+            'extension' => $fileInfo->buffer($imageContent, FILEINFO_EXTENSION),
         ];
 
         $formData = new FormDataPart([
             'id' => $path,
-            'file' => new DataPart($content, $metadata['filename']),
+            'file' => new DataPart($imageContent, $metadata['filename']),
             'metadata' => json_encode($metadata),
             'requireSignedURLs' => !$visibility ? 'true' : 'false',
         ]);
