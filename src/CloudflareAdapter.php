@@ -49,23 +49,31 @@ final class CloudflareAdapter implements FilesystemAdapter, PublicUrlGenerator
         return true;
     }
 
-    public function write(string $path, string $contents, Config $config): void
-    {
-        try {
-            $this->client->upload($path, $contents, $config);
-        } catch (\Throwable $e) {
-            throw UnableToWriteFile::atLocation($path, $e->getMessage(), $e);
-        }
-    }
+	public function write(string $path, string $contents, Config $config): void
+	{
+		try {
+			// Ensure $contents is a string before passing to the client's upload method
+			if (is_resource($contents)) {
+				$contents = stream_get_contents($contents);
+			}
+			$this->client->upload($path, $contents, $config);
+		} catch (\Throwable $e) {
+			throw UnableToWriteFile::atLocation($path, $e->getMessage(), $e);
+		}
+	}
 
-    public function writeStream(string $path, $contents, Config $config): void
-    {
-        try {
-            $this->client->upload($path, $contents, $config);
-        } catch (\Throwable $e) {
-            throw UnableToWriteFile::atLocation($path, $e->getMessage(), $e);
-        }
-    }
+	public function writeStream(string $path, $contents, Config $config): void
+	{
+		try {
+			// Ensure $contents is a string before passing to the client's upload method
+			if (is_resource($contents)) {
+				$contents = stream_get_contents($contents);
+			}
+			$this->client->upload($path, $contents, $config);
+		} catch (\Throwable $e) {
+			throw UnableToWriteFile::atLocation($path, $e->getMessage(), $e);
+		}
+	}
 
     public function read(string $path): string
     {
