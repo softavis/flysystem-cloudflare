@@ -54,20 +54,25 @@ In `config/packages/flysystem.yaml`, add:
 
 ```yaml
 services:
-    Softavis\Flysystem\Cloudflare\Client:
-        arguments:
-            - '@Symfony\Contracts\HttpClient\HttpClientInterface'
-            - "%env(CLOUDFLARE_URL)%"
-            - "%env(CLOUDFLARE_ACCOUNT_ID)%"
-            - "%env(CLOUDFLARE_API_KEY)%"
-    Softavis\Flysystem\Cloudflare\CloudflareAdapter:
-        arguments:
-            - '@Softavis\Flysystem\Cloudflare\Client'
+    cloudflare_adapter:
+        class: 'Softavis\Flysystem\Cloudflare\CloudflareAdapter'
+        arguments: ["@cloudflare_client"]
+
+    cloudflare_client:
+        class: 'Softavis\Flysystem\Cloudflare\Client'
+        arguments: ["@cloudflare.client"] # This argument is our scoped client
+
+framework:
+    http_client:
+        scoped_clients:
+            cloudflare.client:
+                base_uri: "https://api.cloudflare.com/client/v4/accounts/%env(CLOUDFLARE_ACCOUNT_ID)%/images/"
+                auth_bearer: "%env(CLOUDFLARE_API_KEY)%"
 
 flysystem:
     storages:
-        default.storage.cloudflareimages:
-            adapter: 'Softavis\Flysystem\Cloudflare\CloudflareAdapter'
+        images.storage.cloudflareimages:
+            adapter: "cloudflare_adapter"
 ```
 
 ## Changelog
