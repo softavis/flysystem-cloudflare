@@ -69,7 +69,10 @@ Next, add cloudflare flysystem services (edit **config/services.yaml**):
 ```
 cloudflare_adapter:
     class: 'Softavis\Flysystem\Cloudflare\CloudflareAdapter'
-    arguments: [ '@cloudflare_client' ]
+    arguments:
+        - '@cloudflare_client'
+        - '%env(CLOUDFLARE_ACCOUNT_HASH)%'
+        - '%env(CLOUDFLARE_VARIANT_NAME)%'
 
 cloudflare_client:
     class: 'Softavis\Flysystem\Cloudflare\Client'
