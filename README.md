@@ -71,7 +71,7 @@ framework:
 
 flysystem:
     storages:
-        images.storage.cloudflareimages:
+        default.storage:
             adapter: "cloudflare_adapter"
 ```
 
