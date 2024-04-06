@@ -23,9 +23,18 @@ final class CloudflareAdapter implements FilesystemAdapter, PublicUrlGenerator
     /** @var Client $client */
     private $client;
 
-    public function __construct(Client $client)
+    /** @var string */
+    private $accountHash;
+
+    /** @var string */
+    private $variantName;
+
+    public function __construct(Client $client, string $accountHash, string $variantName)
     {
         $this->client = $client;
+
+        $this->accountHash = $accountHash;
+        $this->variantName = $variantName;
     }
 
     public function fileExists(string $path): bool
@@ -202,9 +211,9 @@ final class CloudflareAdapter implements FilesystemAdapter, PublicUrlGenerator
     public function publicUrl(string $path, Config $config): string
     {
         return strtr('https://imagedelivery.net/{accountHash}/{path}/{variant}', [
-            '{accountHash}' => $config->get('accountHash'),
+            '{accountHash}' => $config->get('accountHash', $this->accountHash),
             '{path}' => $path,
-            '{variant}' => $config->get('variantName')
+            '{variant}' => $config->get('variantName', $this->variantName)
         ]);
     }
 }

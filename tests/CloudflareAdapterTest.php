@@ -74,7 +74,7 @@ class CloudflareAdapterTest extends TestCase
 
         $client = new Client(new MockHttpClient([$responseList, $responseDelete]));
 
-        $adapter = new CloudflareAdapter($client);
+        $adapter = new CloudflareAdapter($client, 'test', 'test');
 
         $adapter->deleteDirectory('/images');
 
@@ -88,7 +88,7 @@ class CloudflareAdapterTest extends TestCase
         $variantName = 'public';
 
         $config = ['accountHash' => $accountHash, 'variantName' => $variantName];
-        $adapter = new CloudflareAdapter(new Client(new MockHttpClient()));
+        $adapter = new CloudflareAdapter(new Client(new MockHttpClient()), 'test', 'test');
 
         $imageUrl = $adapter->publicUrl($imageId, new Config($config));
 
@@ -99,7 +99,9 @@ class CloudflareAdapterTest extends TestCase
 
     private function getAdapter(string $fileResponse, int $statusCode = 200): CloudflareAdapter
     {
-        return new CloudflareAdapter(new Client($this->getMockHttpClient($fileResponse, $statusCode)));
+        $client = new Client($this->getMockHttpClient($fileResponse, $statusCode));
+
+        return new CloudflareAdapter($client, 'accountHash', 'variantName');
     }
 
     private function getMockHttpClient(string $fileResponse, int $statusCode = 200): MockHttpClient

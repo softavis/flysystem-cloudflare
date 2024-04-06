@@ -50,6 +50,14 @@ $flysystem = new League\Flysystem\Filesystem($adapter, [
 ```
 
 ### Usage with Symfony 
+Add env's 
+```shell
+CLOUDFLARE_API_KEY=
+CLOUDFLARE_ACCOUNT_ID=
+CLOUDFLARE_ACCOUNT_HASH=
+CLOUDFLARE_VARIANT_NAME=
+```
+
 First, add cloudflare scoped client (edit **config/packages/framework.yaml**) and add:
 ```
 scoped_clients:
@@ -65,7 +73,10 @@ cloudflare_adapter:
 
 cloudflare_client:
     class: 'Softavis\Flysystem\Cloudflare\Client'
-    arguments: [ '@cloudflare.client' ] # This argument is our scoped client
+    arguments:
+        - '@cloudflare.client' # This argument is our scoped client
+        - '%env(CLOUDFLARE_ACCOUNT_HASH)%'
+        - '%env(CLOUDFLARE_VARIANT_NAME)%'
 ```
 
 Last, add *cloudflare_adapter* to flysystem configuration (edit **config/packages/flysystem.yaml**)
