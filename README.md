@@ -1,6 +1,6 @@
 Cloudflare images filesystem for [Flysystem](https://flysystem.thephpleague.com/docs/).
 
-![Code Climate coverage](https://img.shields.io/codeclimate/coverage/softavis/flysystem-cloudflare)
+[![codecov](https://codecov.io/gh/softavis/flysystem-cloudflare/graph/badge.svg?token=2PF82B63B6)](https://codecov.io/gh/softavis/flysystem-cloudflare)
 ![Packagist Downloads](https://img.shields.io/packagist/dt/softavis/flysystem-cloudflare)
 ![GitHub License](https://img.shields.io/github/license/softavis/flysystem-cloudflare)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/softavis/flysystem-cloudflare)
