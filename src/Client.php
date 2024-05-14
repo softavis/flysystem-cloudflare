@@ -116,9 +116,9 @@ final class Client
 
             array_walk(
                 $response['result']['images'],
-                function(array $image) use ($path, &$images) {
+                function (array $image) use ($path, &$images) {
                     if (substr($path, 0, strlen($path)) === $path) {
-                       $images[] = $image;
+                        $images[] = $image;
                     }
                 }
             );

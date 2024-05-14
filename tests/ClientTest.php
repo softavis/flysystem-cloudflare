@@ -13,9 +13,14 @@ use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 
 class ClientTest extends TestCase
 {
+    private const ACCOUNT_ID = 'access-id';
+    private const ACCESS_TOKEN = 'access-token';
+
     public function testGetReturnSuccess(): void
     {
-        $client = new Client($this->getMockHttpClient('request-get-success.json'));
+        $mockClient = $this->getMockHttpClient('request-get-success.json');
+
+        $client = new Client($mockClient, self::ACCOUNT_ID, self::ACCESS_TOKEN);
 
         $response = $client->get('some-image.jpeg');
 
@@ -31,7 +36,9 @@ class ClientTest extends TestCase
 
     public function testGetReturnError(): void
     {
-        $client = new Client($this->getMockHttpClient('request-get-error.json', 404));
+        $mockClient = $this->getMockHttpClient('request-get-error.json', 404);
+
+        $client = new Client($mockClient, self::ACCOUNT_ID, self::ACCESS_TOKEN);
 
         $this->expectException(ClientExceptionInterface::class);
 
@@ -40,7 +47,9 @@ class ClientTest extends TestCase
 
     public function testReadReturnSuccess(): void
     {
-        $client = new Client($this->getMockHttpClient('request-read-success.txt'));
+        $mockClient = $this->getMockHttpClient('request-read-success.txt');
+
+        $client = new Client($mockClient, self::ACCOUNT_ID, self::ACCESS_TOKEN);
 
         $response = $client->read('some-image.jpeg');
 
@@ -57,7 +66,7 @@ class ClientTest extends TestCase
             new MockResponse($responseWithoutToken, ['http_code' => 200]),
         ]);
 
-        $client = new Client($mockHttpClient);
+        $client = new Client($mockHttpClient, self::ACCOUNT_ID, self::ACCESS_TOKEN);
 
         $images = $client->list('/thumbnails');
 
@@ -76,7 +85,9 @@ class ClientTest extends TestCase
     {
         $image = file_get_contents(__DIR__.'/files/example.png');
 
-        $client = new Client($this->getMockHttpClient('request-upload-success.json'));
+        $mockClient = $this->getMockHttpClient('request-upload-success.json');
+
+        $client = new Client($mockClient, self::ACCOUNT_ID, self::ACCESS_TOKEN);
 
         $response = $client->upload('new-image.png', $image, new Config());
 
@@ -92,7 +103,9 @@ class ClientTest extends TestCase
 
     public function testUpdateReturnSuccess(): void
     {
-        $client = new Client($this->getMockHttpClient('request-update-success.json'));
+        $mockClient = $this->getMockHttpClient('request-update-success.json');
+
+        $client = new Client($mockClient, self::ACCOUNT_ID, self::ACCESS_TOKEN);
 
         $response = $client->update('new-image.png', new Config());
 
@@ -108,7 +121,9 @@ class ClientTest extends TestCase
 
     public function testDeleteReturnSuccess(): void
     {
-        $client = new Client($this->getMockHttpClient('request-delete-success.json'));
+        $mockClient = $this->getMockHttpClient('request-delete-success.json');
+
+        $client = new Client($mockClient, self::ACCOUNT_ID, self::ACCESS_TOKEN);
 
         $response = $client->delete('new-image.png');
 

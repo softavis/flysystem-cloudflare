@@ -13,6 +13,9 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class CloudflareAdapterTest extends TestCase
 {
+    private const ACCOUNT_ID = 'access-id';
+    private const ACCESS_TOKEN = 'access-token';
+
     public function testFileExistsReturnSuccess(): void
     {
         $adapter = $this->getAdapter('request-get-success.json');
@@ -72,7 +75,9 @@ class CloudflareAdapterTest extends TestCase
         $responseList = new MockResponse(file_get_contents(__DIR__.'/responses/request-list-success.json'));
         $responseDelete = new MockResponse(file_get_contents(__DIR__.'/responses/request-delete-success.json'));
 
-        $client = new Client(new MockHttpClient([$responseList, $responseDelete]));
+        $mockClient = new MockHttpClient([$responseList, $responseDelete]);
+
+        $client = new Client($mockClient, self::ACCOUNT_ID, self::ACCESS_TOKEN);
 
         $adapter = new CloudflareAdapter($client, 'test', 'test');
 
@@ -88,7 +93,10 @@ class CloudflareAdapterTest extends TestCase
         $variantName = 'public';
 
         $config = ['accountHash' => $accountHash, 'variantName' => $variantName];
-        $adapter = new CloudflareAdapter(new Client(new MockHttpClient()), 'test', 'test');
+
+        $client = new Client(new MockHttpClient(), self::ACCOUNT_ID, self::ACCESS_TOKEN);
+
+        $adapter = new CloudflareAdapter($client, 'test', 'test');
 
         $imageUrl = $adapter->publicUrl($imageId, new Config($config));
 
@@ -99,7 +107,9 @@ class CloudflareAdapterTest extends TestCase
 
     private function getAdapter(string $fileResponse, int $statusCode = 200): CloudflareAdapter
     {
-        $client = new Client($this->getMockHttpClient($fileResponse, $statusCode));
+        $mockClient = $this->getMockHttpClient($fileResponse, $statusCode);
+
+        $client = new Client($mockClient, self::ACCOUNT_ID, self::ACCESS_TOKEN);
 
         return new CloudflareAdapter($client, 'accountHash', 'variantName');
     }
