@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Softavis\Flysystem\Cloudflare;
 
 use DateTime;
+use DateTimeInterface;
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;

@@ -27,7 +27,7 @@
         "php": ">=7.2.5",
         "ext-fileinfo": "*",
         "ext-json": "*",
-        "league/flysystem": "^2.0||^3.0",
+        "league/flysystem": "^2.1||^3.0",
         "symfony/mime": "^5.4||^6.0||^7.0",
         "symfony/http-client": "^5.4||^6.0||^7.0"
     },

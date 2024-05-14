@@ -6,10 +6,8 @@ namespace Softavis\Flysystem\Cloudflare;
 
 use finfo;
 use League\Flysystem\Config;
-use League\Flysystem\Visibility;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
-use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -19,10 +17,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class Client
 {
+    private const API_URL = 'https://api.cloudflare.com/client/v4/accounts/{accountId}/images/';
+
     private const API_VERSION = 'v1';
 
     private const DEFAULT_LIMIT = 1000;
-    private const DEFAULT_ORDER = 'DESC';
+    private const DEFAULT_ORDER = 'desc';
 
     private const METHOD_GET = 'GET';
     private const METHOD_POST = 'POST';
@@ -32,9 +32,12 @@ final class Client
     /** @var HttpClientInterface $client */
     private $client;
 
-    public function __construct(HttpClientInterface $client)
+    public function __construct(HttpClientInterface $client, string $accountId, string $token)
     {
-        $this->client = $client;
+        $this->client = $client->withOptions([
+            'base_uri' => strtr(self::API_URL, ['{accountId}' => $accountId]),
+            'auth_bearer' => $token,
+        ]);
     }
 
     /**
@@ -103,7 +106,7 @@ final class Client
              *     messages: string[]
              * } $response
              */
-            $response = $this->client->request(self::METHOD_GET, 'v2/', [
+            $response = $this->client->request(self::METHOD_GET, 'v2', [
                 'query' => [
                     'per_page' => $perPage,
                     'sort_order' => $sortOrder,
