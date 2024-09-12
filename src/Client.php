@@ -166,7 +166,7 @@ final class Client
 
         return $this->client->request(self::METHOD_POST, self::API_VERSION, [
             'headers' => $formData->getPreparedHeaders()->toArray(),
-            'body' => $formData->toIterable(),
+            'body' => $formData->bodyToString(),
         ])->toArray();
     }
 
